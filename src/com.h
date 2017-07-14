@@ -69,7 +69,7 @@ extern	void	Com1TxStart(void);
 
 
 #define			COM1_MAX_TX_BUF		100
-#define			COM1_MAX_RX_BUF		12
+#define			COM1_MAX_RX_BUF		20
 unsigned char	Com1RxBuffer[COM1_MAX_RX_BUF];
 unsigned char 	cntRx = 0;
 
@@ -151,7 +151,7 @@ extern	unsigned 	long	Com1BaudRate;
 extern void Init_Com1RxBuffer(void);
 extern void Interrupt_COM1Tx(void);
 void serial_interrupt();
-extern void SetCom1TxEnable(void);
+extern void Com1TxStart(void);
 void Com1Tx_init();
 
 

@@ -53,11 +53,11 @@ void Interrupt_COM1Tx(void)
 }
 
 
-void Interrupt_COM1Rx(unsigned char buf)
+void Interrupt_COM1Rx(unsigned char RxData)
 {	
-	if (buf == 0x01)	cntRx = 0;
+	if (RxData == 0x01)	cntRx = 0;
 		
-	Com1RxBuffer[cntRx] = buf;	
+	Com1RxBuffer[cntRx] = RxData;	
 	
 	if (Com1RxBuffer[cntRx] == 0x00){
 		Com1RxStatus = RX_GOOD;
@@ -71,7 +71,7 @@ void Interrupt_COM1Rx(unsigned char buf)
 
 
 
-void SetCom1TxEnable(void)
+void Com1TxStart(void)
 {
 	char i;
 
@@ -83,9 +83,9 @@ void SetCom1TxEnable(void)
 	TX485_EN = 1;	
 }
 
-void Com1_TxData_NextAll()
+void Com1TxNextToEnd()
 {
-	if (index >=6){
+	if (Com1RxBuffer[index] == 0x00){
 		DelayMs(3);
 		TXIE_485 = 0;
 		TX485_EN = 0;	
@@ -105,10 +105,10 @@ void serial_interrupt()
 	if((TXIE_485)&&(TXIF))										/*transmit interrupt routine*/
 	{
         TXIF=0;
-		Com1_TxData_NextAll();		
+		Com1TxNextToEnd();		
 	}	
 
-	if( (RCIE_485)&&(RCIF) )										/*receive interrupt routine*/
+	if((RCIE_485)&&(RCIF))										/*receive interrupt routine*/
 	{
         RCIF = 0;
 		buf = RCREG;	
@@ -117,7 +117,7 @@ void serial_interrupt()
 		}
 	}	
 
-	if(OERR) {
+	if(OERR){
       	TXEN=0;
       	TXEN=1;
       	SPEN=0;
@@ -125,7 +125,7 @@ void serial_interrupt()
 		CREN=0;
     }
 
-	if( !CREN)	CREN=1;
+	if( !CREN )	CREN=1;
 
 }
 

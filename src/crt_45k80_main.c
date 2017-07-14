@@ -77,13 +77,10 @@ void LoadCom1buf_StartLCDCmd(unsigned char *buf)
 		com1_buf[i] = buf[i];
 	}
 
-	SetCom1TxEnable();
+	Com1TxStart();
 }
 
 
-
-
-volatile unsigned int mytest=0;
 /*
 // Rx 데이타를 받으면 받은 데이타를 Tx로 다시 돌려 보내는 프로그램이다. 	 
 */
@@ -115,21 +112,12 @@ void main(void)
     while (1)
 	{ 		
         CLRWDT();
-		/*
-		if (MainTimer > 3)
-		{
-			MainTimer = 0;
-			SetCom1TxEnable();
-		}*/
-		
+
 		if(Com1RxStatus == RX_GOOD){
 			Com1RxStatus = RTX_CHK;
 			LED_RX = !LED_RX;			
-			// LoadCom1buf_StartLCDCmd(Com1RxBuffer);
-			SetCom1TxEnable();
+			Com1TxStart();
 		}
-		
-
     }
 }
 
@@ -152,8 +140,6 @@ void interrupt isr(void)
 			
 			MainTimer++;			
         } 
-
-		mytest++;
     }
 
 	serial_interrupt();	
