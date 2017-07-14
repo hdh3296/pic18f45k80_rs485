@@ -36,8 +36,8 @@ void    init_comms(void)
 	TRISC6=OUTPUT;
 	TRISC7=INPUT;
 
-    RCIE=0;	    // USART RX interrupt enable
-    RS_TXIE=0;	    // USART TX interrupt enable
+    RCIE_485=0;	    // USART RX interrupt enable
+    TXIE_485=0;	    // USART TX interrupt enable
 
     RCIF=0;	    // USART RX interrupt enable
     TXIF=0;	    // USART TX interrupt enable
@@ -53,17 +53,11 @@ void Interrupt_COM1Tx(void)
 }
 
 
-void Interrupt_COM1Rx(void)
-{
-
-   	unsigned char   buf;
-	
-	if (RCREG == 0x01)	cntRx = 0;
-
-
-   	buf = RCREG;		
-	Com1RxBuffer[cntRx] = buf;
-	
+void Interrupt_COM1Rx(unsigned char buf)
+{	
+	if (buf == 0x01)	cntRx = 0;
+		
+	Com1RxBuffer[cntRx] = buf;	
 	
 	if (Com1RxBuffer[cntRx] == 0x00){
 		Com1RxStatus = RX_GOOD;
@@ -83,8 +77,8 @@ void SetCom1TxEnable(void)
 
     Com1RxStatus = TX_SET;
 	index = 0;
-	RS_TXREG = Com1RxBuffer[index];
-	RS_TXIE = TRUE; 
+	TXREG_485 = Com1RxBuffer[index];
+	TXIE_485 = TRUE; 
 	LED_TX = !LED_TX;
 	TX485_EN = 1;	
 }
@@ -93,32 +87,33 @@ void Com1_TxData_NextAll()
 {
 	if (index >=6){
 		DelayMs(3);
-		RS_TXIE = 0;
+		TXIE_485 = 0;
 		TX485_EN = 0;	
 		return;
 	}
 	
 	index++;
-	RS_TXREG = Com1RxBuffer[index];
+	TXREG_485 = Com1RxBuffer[index];
 }
 
 
 void serial_interrupt()
 {
-
 	char i;
+	unsigned char   buf;
 
-	if((RS_TXIE)&&(TXIF))										/*transmit interrupt routine*/
+	if((TXIE_485)&&(TXIF))										/*transmit interrupt routine*/
 	{
         TXIF=0;
 		Com1_TxData_NextAll();		
 	}	
 
-	if( (RCIE)&&(RCIF) )										/*receive interrupt routine*/
+	if( (RCIE_485)&&(RCIF) )										/*receive interrupt routine*/
 	{
         RCIF = 0;
-		if(RS_TXIE != 1){
-        	Interrupt_COM1Rx();
+		buf = RCREG;	
+		if(TXIE_485 != 1){
+        	Interrupt_COM1Rx(buf);
 		}
 	}	
 

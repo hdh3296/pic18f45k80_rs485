@@ -103,8 +103,8 @@ void main(void)
 	msec100=0;
 	Com1SerialTime=0;		
 
-	RS_TXIE=0;
-	RCIE=1;
+	TXIE_485=0;
+	RCIE_485=1;
 
 	TRISD5=0;
 	TX485_EN=0;

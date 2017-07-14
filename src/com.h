@@ -13,13 +13,15 @@
 #endif
 
 
-#define RS_TXIE 	TXIE
-#define	RS_TXREG	TXREG
+#define TXIE_485 	TXIE
+#define RCIE_485 	RCIE
+#define	TXREG_485	TXREG
 
 
 extern	void    init_comms(void);
 
-extern  void 	Interrupt_COM1Rx(void);
+void Interrupt_COM1Rx(unsigned char buf);
+
 extern	void	Com1TxStart(void);
 
 
